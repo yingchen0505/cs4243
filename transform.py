@@ -36,6 +36,32 @@ def cs4243_resize(image, new_width, new_height):
     if len(image.shape)==2:
         new_image = np.zeros((new_height, new_width), dtype='uint8')
     ###Your code here####
+    print(image.shape)
+    print(image.shape[0])
+
+    height_ratio = new_height / image.shape[0]
+    width_ratio = new_width / image.shape[1]
+
+    print(height_ratio)
+    print(width_ratio)
+
+    row_number = 0
+    col_number = 0
+
+    for row in image:
+        for val in row:
+            new_col_start = int(col_number * height_ratio)
+            new_row_start = int(row_number * width_ratio)
+            new_col_end = int((col_number + 1) * height_ratio)
+            new_row_end = int((row_number + 1) * width_ratio)
+            for new_col_number in range(new_col_start, new_col_end):
+                for new_row_number in range(new_row_start, new_row_end):
+                    new_image[new_row_number][new_col_number] = val
+            col_number += 1
+        row_number += 1
+        col_number = 0
+
+    print(new_image)
 
     ###
     return new_image
