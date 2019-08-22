@@ -1,6 +1,7 @@
 import numpy as np
 from skimage import io
 import os.path as osp
+import math as math
 
 def load_image(file_name):
     """
@@ -32,9 +33,13 @@ def cs4243_resize(image, new_width, new_height):
     :param new_height: int
     :return: new_image: numpy.ndarray
     """
+    # new_image = np.zeros((new_height, new_width, 3), dtype='float')
     new_image = np.zeros((new_height, new_width, 3), dtype='uint8')
+    new_image_update_counter = np.zeros((new_height, new_width, 3), dtype='uint8')
     if len(image.shape)==2:
+        # new_image = np.zeros((new_height, new_width), dtype='float')
         new_image = np.zeros((new_height, new_width), dtype='uint8')
+        new_image_update_counter = np.zeros((new_height, new_width), dtype='uint8')
     ###Your code here####
     print(image.shape)
     print(image.shape[0])
@@ -44,23 +49,45 @@ def cs4243_resize(image, new_width, new_height):
 
     print(height_ratio)
     print(width_ratio)
+    #
+    # row_number = 0
+    # col_number = 0
+    #
+    # for row in image:
+    #     for val in row:
+    #         new_col_start = int(col_number * width_ratio)
+    #         new_row_start = int(row_number * height_ratio)
+    #         new_col_end = int((col_number + 1) * width_ratio)
+    #         new_row_end = int((row_number + 1) * height_ratio)
+    #         for new_col_number in range(new_col_start, new_col_end):
+    #             for new_row_number in range(new_row_start, new_row_end):
+    #                 new_image[new_row_number][new_col_number] = val
+    #                 # new_image[new_row_number][new_col_number] += val
+    #                 # new_image_update_counter[new_row_number][new_col_number] += 1
+    #         col_number += 1
+    #     row_number += 1
+    #     col_number = 0
 
-    row_number = 0
-    col_number = 0
-
-    for row in image:
-        for val in row:
-            new_col_start = int(col_number * height_ratio)
-            new_row_start = int(row_number * width_ratio)
-            new_col_end = int((col_number + 1) * height_ratio)
-            new_row_end = int((row_number + 1) * width_ratio)
+    for row_number in range(image.shape[0]):
+        for col_number in range(image.shape[1]):
+            new_col_start = int(col_number * width_ratio)
+            new_row_start = int(row_number * height_ratio)
+            new_col_end = int((col_number + 1) * width_ratio)
+            new_row_end = int((row_number + 1) * height_ratio)
             for new_col_number in range(new_col_start, new_col_end):
                 for new_row_number in range(new_row_start, new_row_end):
-                    new_image[new_row_number][new_col_number] = val
-            col_number += 1
-        row_number += 1
-        col_number = 0
+                    new_image[new_row_number][new_col_number] += image[row_number][col_number]
+                    new_image_update_counter[new_row_number][new_col_number] += 1
 
+
+    print(new_image)
+    #
+    for row_number in range(new_image.shape[0]):
+        for col_number in range(new_image.shape[1]):
+            new_value = new_image[row_number][col_number] / new_image_update_counter[row_number][col_number]
+            new_image[row_number][col_number] = new_value
+
+    print(new_image_update_counter)
     print(new_image)
 
     ###
