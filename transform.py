@@ -81,7 +81,9 @@ def cs4243_rotate180(kernel):
     :return:
     """
     ###Your code here####
-
+    kernel = np.rot90(kernel)
+    kernel = np.rot90(kernel)
+    
     ###
     return kernel
 
