@@ -223,6 +223,14 @@ def cs4243_downsample(image, ratio):
     """
 
     ###Your code here####
+    new_width = int(image.shape[1]/ratio)
+    new_height = int(image.shape[0]/ratio)
+    downsample_image = np.zeros((new_height, new_width), dtype='float')
+    for row_number in range(downsample_image.shape[0]):
+        for col_number in range(downsample_image.shape[1]):
+            old_col = int(col_number * ratio)
+            old_row = int(row_number * ratio)
+            downsample_image[row_number][col_number] = image[old_row][old_col]
 
     ###
     return downsample_image
