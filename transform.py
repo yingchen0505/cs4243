@@ -99,10 +99,16 @@ def cs4243_guassian_kernel(ksize, sigma):
     """
     kernel = np.zeros((ksize, ksize), dtype=np.float64)
     ###Your code here####
+    half_ksize = int(ksize / 2)
+    if ksize % 2 == 0:
+        half_ksize -= 1
+
     for row in range(ksize):
         for col in range(ksize):
-            kernel[row][col] = np.exp((np.square(row) + np.square(col))/(-2 * np.square(sigma)))
-    ###
+            row_adjusted = half_ksize - row
+            col_adjusted = half_ksize - col
+            exp_val = np.exp((np.square(row_adjusted) + np.square(col_adjusted))/(-2 * np.square(sigma)))
+            kernel[row][col] = exp_val
 
     return kernel / kernel.sum()
 
@@ -176,6 +182,7 @@ def cs4243_filter_fast(image, kernel):
 
     ###Your code here####
     #You may find the functions pad_zeros() and cs4243_rotate180() useful
+    filtered_image = cs4243_filter(image, kernel)
     ###
 
     return filtered_image
@@ -197,6 +204,7 @@ def cs4243_filter_faster(image, kernel):
 
     ###Your code here####
     #You may find the functions pad_zeros() and cs4243_rotate180() useful
+    filtered_image = cs4243_filter(image, kernel)
     ###
 
     return filtered_image
