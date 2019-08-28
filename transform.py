@@ -37,8 +37,6 @@ def cs4243_resize(image, new_width, new_height):
     if len(image.shape)==2:
         new_image = np.zeros((new_height, new_width), dtype='uint8')
     ###Your code here####
-    print(image.shape)
-    print(image.shape[0])
 
     height_ratio = image.shape[0] / new_height
     width_ratio = image.shape[1] / new_width
@@ -65,10 +63,15 @@ def cs4243_rgb2grey(image):
         print('Image should have 3 channels')
         return
     ###Your code here####
+    new_image = np.zeros((image.shape[0], image.shape[1]), dtype='float')
+    weights = np.array([0.299, 0.587, 0.114])
 
+    for row_number in range(image.shape[0]):
+        for col_number in range(image.shape[1]):
+            new_image[row_number][col_number] = np.dot(weights, image[row_number][col_number])
+
+    return new_image/255.
     ###
-
-    return image/255.
 
 def cs4243_rotate180(kernel):
     """
