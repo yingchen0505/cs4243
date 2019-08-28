@@ -83,7 +83,7 @@ def cs4243_rotate180(kernel):
     ###Your code here####
     kernel = np.rot90(kernel)
     kernel = np.rot90(kernel)
-    
+
     ###
     return kernel
 
@@ -117,6 +117,25 @@ def cs4243_filter(image, kernel):
     filtered_image = np.zeros((Hi, Wi))
 
     ###Your code here####
+
+    kernel = cs4243_rotate180(kernel)
+
+    pad_height = int((Hk - 1) / 2)
+    pad_width = int((Wk - 1) / 2)
+    image = pad_zeros(image, pad_height, pad_width)
+
+    half_Hk = int(Hk/2)
+    half_Wk = int(Wk/2)
+
+    for Ri in range(pad_height, Hi + pad_height):
+        for Ci in range(pad_width, Wi + pad_width):
+            val = 0
+            for Rk in range(Hk):
+                for Ck in range(Wk):
+                    H_from_centre = half_Hk - Rk
+                    W_from_centre = half_Wk - Ck
+                    val += image[Ri - H_from_centre][Ci - W_from_centre] * kernel[Rk][Ck]
+            filtered_image[Ri - pad_height][Ci - pad_width] = val
 
     ###
 
