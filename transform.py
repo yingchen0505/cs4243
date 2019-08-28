@@ -99,7 +99,9 @@ def cs4243_guassian_kernel(ksize, sigma):
     """
     kernel = np.zeros((ksize, ksize), dtype=np.float64)
     ###Your code here####
-
+    for row in range(ksize):
+        for col in range(ksize):
+            kernel[row][col] = np.exp((np.square(row) + np.square(col))/(-2 * np.square(sigma)))
     ###
 
     return kernel / kernel.sum()
