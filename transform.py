@@ -221,18 +221,19 @@ def cs4243_filter_faster(image, kernel):
     pad_width = int((Wk - 1) / 2)
     image = pad_zeros(image, pad_height, pad_width)
 
-    image_sections = np.zeros(Hi*Wi, Hk*Wk)
-    new_kernel = np.zeros(Hk * Wk, 1)
+    Ht = Hk*Wk
+    Wt = Hi*Wi
+    input_transformed = np.zeros((Ht, Wt))
+    new_kernel = kernel.reshape(1, (Hk * Wk))
 
-    for Ri in range(image.shape[0] - pad_height - 1):
-        for Ci in range(image.shape[1] - pad_width - 1):
+    for Ri in range(Hi):
+        for Ci in range(Wi):
             image_section = image[Ri:Ri + Hk, Ci:Ci + Wk]
-            image_sections[Ri * Hk: Ri * Hk + Hk, Ci * Wk: Ci * Wk + Wk] = image_section
-            # val = np.multiply(image_section, kernel).sum()
-            # filtered_image[Ri][Ci] = val
+            input_transformed[:Ht, Ci + Ri*Wi] = image_section.reshape(Ht)
 
-    # for Ck in range(Wk):
-    #     # new_kernel[Ck * Wk]
+    multiplied = np.dot(new_kernel, input_transformed)
+    filtered_image = multiplied.reshape(Hi, Wi)
+
     ###
 
     return filtered_image
