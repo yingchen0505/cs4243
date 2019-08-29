@@ -217,8 +217,8 @@ def cs4243_filter_faster(image, kernel):
 
     kernel = cs4243_rotate180(kernel)
 
-    pad_height = int((Hk - 1) / 2)
-    pad_width = int((Wk - 1) / 2)
+    pad_height = int(np.rint((Hk - 1) / 2))
+    pad_width = int(np.rint((Wk - 1) / 2))
     image = pad_zeros(image, pad_height, pad_width)
 
     Ht = Hk*Wk
