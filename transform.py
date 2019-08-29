@@ -184,16 +184,15 @@ def cs4243_filter_fast(image, kernel):
 
     kernel = cs4243_rotate180(kernel)
 
-    pad_height = int((Hk - 1) / 2)
-    pad_width = int((Wk - 1) / 2)
+    pad_height = int(np.rint((Hk - 1) / 2))
+    pad_width = int(np.rint((Wk - 1) / 2))
     image = pad_zeros(image, pad_height, pad_width)
 
     for Ri in range(image.shape[0] - pad_height - 1):
         for Ci in range(image.shape[1] - pad_width - 1):
             image_section = image[Ri:Ri + Hk, Ci:Ci + Wk]
-            val = np.dot(image_section, kernel).sum()
+            val = np.multiply(image_section, kernel).sum()
             filtered_image[Ri][Ci] = val
-
     ###
 
     return filtered_image
@@ -252,14 +251,13 @@ def cs4243_downsample(image, ratio):
     """
 
     ###Your code here####
-    new_width = int(image.shape[1]/ratio)
-    new_height = int(image.shape[0]/ratio)
-    downsample_image = np.zeros((new_height, new_width), dtype='float')
+    new_width = int(np.rint(image.shape[1]/ratio))
+    new_height = int(np.rint(image.shape[0]/ratio))
+    downsample_image = np.zeros((new_height, new_width))
     for row_number in range(downsample_image.shape[0]):
         for col_number in range(downsample_image.shape[1]):
-            old_col = int(col_number * ratio)
-            old_row = int(row_number * ratio)
+            old_col = col_number * ratio
+            old_row = row_number * ratio
             downsample_image[row_number][col_number] = image[old_row][old_col]
-
     ###
     return downsample_image
