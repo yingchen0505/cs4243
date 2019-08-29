@@ -191,7 +191,7 @@ def cs4243_filter_fast(image, kernel):
     for Ri in range(image.shape[0] - pad_height - 1):
         for Ci in range(image.shape[1] - pad_width - 1):
             image_section = image[Ri:Ri + Hk, Ci:Ci + Wk]
-            val = np.multiply(image_section, kernel).sum()
+            val = np.dot(image_section, kernel).sum()
             filtered_image[Ri][Ci] = val
 
     ###
@@ -204,7 +204,7 @@ def cs4243_filter_faster(image, kernel):
     Implement a faster version of filtering algorithm.
     Pre-extract all the regions of kernel size,
     and arrange them into a matrix of shape (Hi*Wi, Hk*Wk),also arrage the flipped
-    kernel to be of shape (Hk*Hk, 1), then do matrix multiplication
+    kernel to be of shape (Hk*Hk, 1), then do matrix multiplication\
     :param image: numpy.ndarray
     :param kernel: numpy.ndarray
     :return filtered_image: numpy.ndarray
@@ -214,8 +214,25 @@ def cs4243_filter_faster(image, kernel):
     filtered_image = np.zeros((Hi, Wi))
 
     ###Your code here####
-    #You may find the functions pad_zeros() and cs4243_rotate180() useful
-    filtered_image = cs4243_filter(image, kernel)
+
+    kernel = cs4243_rotate180(kernel)
+
+    pad_height = int((Hk - 1) / 2)
+    pad_width = int((Wk - 1) / 2)
+    image = pad_zeros(image, pad_height, pad_width)
+
+    image_sections = np.zeros(Hi*Wi, Hk*Wk)
+    new_kernel = np.zeros(Hk * Wk, 1)
+
+    for Ri in range(image.shape[0] - pad_height - 1):
+        for Ci in range(image.shape[1] - pad_width - 1):
+            image_section = image[Ri:Ri + Hk, Ci:Ci + Wk]
+            image_sections[Ri * Hk: Ri * Hk + Hk, Ci * Wk: Ci * Wk + Wk] = image_section
+            # val = np.multiply(image_section, kernel).sum()
+            # filtered_image[Ri][Ci] = val
+
+    # for Ck in range(Wk):
+    #     # new_kernel[Ck * Wk]
     ###
 
     return filtered_image
