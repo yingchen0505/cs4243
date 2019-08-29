@@ -181,8 +181,19 @@ def cs4243_filter_fast(image, kernel):
     filtered_image = np.zeros((Hi, Wi))
 
     ###Your code here####
-    #You may find the functions pad_zeros() and cs4243_rotate180() useful
-    filtered_image = cs4243_filter(image, kernel)
+
+    kernel = cs4243_rotate180(kernel)
+
+    pad_height = int((Hk - 1) / 2)
+    pad_width = int((Wk - 1) / 2)
+    image = pad_zeros(image, pad_height, pad_width)
+
+    for Ri in range(image.shape[0] - pad_height - 1):
+        for Ci in range(image.shape[1] - pad_width - 1):
+            image_section = image[Ri:Ri + Hk, Ci:Ci + Wk]
+            val = np.multiply(image_section, kernel).sum()
+            filtered_image[Ri][Ci] = val
+
     ###
 
     return filtered_image
