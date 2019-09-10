@@ -18,8 +18,41 @@ def randCent(data,k):
     return
         centroids: <class 'numpy.ndarray'>, shape=[k, n_features]
     """
-    
+    n_samples = data.shape[0]
+    n_features = data.shape[1]
+    centroids = np.zeros((k, n_features))
+    rand_range = n_samples - 1
+    for i in range(k):
+        random_index = random.randint(0, rand_range)
+        centroids[i] = data[random_index]
     return centroids
+
+# assign points to centroids
+def assign(data, k, centroids):
+    """ return assignment:  <class 'numpy.matrix'>, shape=[n_samples, 1]"""
+    n_samples = data.shape[0]
+    n_features = data.shape[1]
+    assignments = np.zeros((n_samples, 1))
+
+    # Loop through every data point
+    for i in range(n_samples):
+
+        # For every centroid, calculate distance
+        distances = np.zeros(k)
+        for j in range(k):
+            # Add up for each feature
+            for m in range(n_features):
+                distances[j] += pow(data[i][m] - centroids[j][m], 2)
+            # no need to divide since we are looking for the min
+
+        min_dist = min(distances)
+        for j in range(k):
+            if distances[j] == min_dist:
+                assignments[i] = j
+                break
+
+    return assignments
+
 def KMeans(data,k):
     """ KMeans algorithm 
     parameters
@@ -32,7 +65,34 @@ def KMeans(data,k):
         centroids: <class 'numpy.ndarray'>, shape=[k, n_features]
         clusterAssment:  <class 'numpy.matrix'>, shape=[n_samples, 1]
     """
+    centroids = randCent(data, k)
+    n_samples = data.shape[0]
+    n_features = data.shape[1]
+
+    not_converged = True
+    while(not_converged):
+        clusterAssment = assign(data, k, centroids)
+
+        not_converged = False
+
+        # For each cluster, recalculate centroid
+        for i in range(k):
+            new_centroid = np.zeros(n_features)
+            for j in range(n_features):
+                new_feature = 0
+                counter = 0
+                for m in range(n_samples):
+                    if clusterAssment[m] == i:
+                        new_feature += data[m][j]
+                        counter += 1
+                new_feature /= counter
+                new_centroid[j] = new_feature
+            if not np.array_equal(new_centroid, centroids[i]):
+                not_converged = True
+            centroids[i] = new_centroid
+
     return centroids, clusterAssment
+
 
 ##############################################color #############################################################
 import random
