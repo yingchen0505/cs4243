@@ -159,6 +159,8 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,min_bin_freq=1, 
         (seed, X, nbrs, max_iter) for seed in seeds)#
     ##########################################parallel computing############################
 
+    print(all_res)
+
     return cluster_centers, labels
 
 def get_bin_seeds(X, bin_size, min_bin_freq=1):
@@ -172,24 +174,17 @@ def get_bin_seeds(X, bin_size, min_bin_freq=1):
         bin_seeds: dict-like bin_seeds = {key=seed, key_value=he total number of pixels which is in the sphere }
     """
     # Bin points
-    # print(X)
-    # n_samples = X.shape[0]
     n_features = X.shape[1]
 
     X_compressed = np.round(X/bin_size)
-    # print(X_compressed)
 
     bin_seeds = {}
     for sample in X_compressed:
         tuple_sample = tuple(sample)
         if tuple_sample in bin_seeds:
-        # if sample in bin_seeds:
-        #     print(tuple_sample)
             bin_seeds[tuple_sample] += 1
-            # bin_seeds[sample] += 1
         else:
             bin_seeds[tuple_sample] = 0
-            # bin_seeds[sample] = 0
 
     bin_seeds_resized = {}
 
@@ -200,22 +195,5 @@ def get_bin_seeds(X, bin_size, min_bin_freq=1):
             new_key[i] = key[i] * bin_size
         new_key_tuple = tuple(new_key)
         bin_seeds_resized[new_key_tuple] = value
-
-    print(bin_seeds_resized)
-
-    # # find the max and min of each feature
-    # feature_ranges = np.zeros((n_features, 2))
-    # for i in range(n_features):
-    #     feature_ranges[i][0] = min(X[:, i])
-    #     feature_ranges[i][1] = max(X[:, i])
-    #
-    # bin_seeds = []
-    # for i in range(bin_size):
-    #     seed = np.zeros(n_features)
-    #     for j in range(n_features):
-    #         rand_num = random.randint(feature_ranges[j][0], feature_ranges[j][1])
-    #         seed[j] = rand_num
-    #     bin_seeds.append({"key": seed, "key_value":})
-
 
     return bin_seeds_resized
