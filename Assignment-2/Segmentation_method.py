@@ -131,19 +131,30 @@ def _mean_shift_single_seed(my_mean, X, nbrs, max_iter):
     """
     # For each seed, climb gradient until convergence or max_iter
     n_features = X.shape[1]
-    # for i in range(max_iter):
-    # Find neighbors
-    seed_array = seed_to_array(my_mean, n_features)
-    neighbors = nbrs.radius_neighbors(seed_array, return_distance=False)[0]
+    is_converged = False
+    my_mean = seed_to_array(my_mean, n_features)
 
-    # Calculate centre of gravity
-    mean = np.zeros((1, n_features))
-    for neighbor in neighbors:
-        mean += X[neighbor]
-    mean /= len(neighbors)
-    print(mean)
+    for i in range(max_iter):
+        if is_converged:
+            break
 
-    return mean
+        # Find neighbors
+        neighbors = nbrs.radius_neighbors(my_mean, return_distance=False)[0]
+
+        # Calculate centre of gravity
+        new_mean = np.zeros((1, n_features))
+        for neighbor in neighbors:
+            new_mean += X[neighbor]
+        new_mean /= len(neighbors)
+        print(new_mean)
+
+        if np.array_equal(my_mean, new_mean):
+            is_converged = True
+
+        else:
+            my_mean = new_mean
+
+    return my_mean
 
 # Since the seed has tuple as key, we need to convert back
 def seed_to_array(seed, n_features):
