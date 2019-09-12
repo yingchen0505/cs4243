@@ -146,7 +146,6 @@ def _mean_shift_single_seed(my_mean, X, nbrs, max_iter):
         for neighbor in neighbors:
             new_mean += X[neighbor]
         new_mean /= len(neighbors)
-        print(new_mean)
 
         if np.array_equal(my_mean, new_mean):
             is_converged = True
@@ -154,7 +153,9 @@ def _mean_shift_single_seed(my_mean, X, nbrs, max_iter):
         else:
             my_mean = new_mean
 
-    return my_mean
+    neighbors = nbrs.radius_neighbors(my_mean, return_distance=False)[0]
+
+    return my_mean, len(neighbors)
 
 # Since the seed has tuple as key, we need to convert back
 def seed_to_array(seed, n_features):
@@ -183,19 +184,10 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,min_bin_freq=1, 
     if bin_seeding:
         seeds = get_bin_seeds(X, bandwidth)
 
+    print(len(seeds))
+
     # find the points within the sphere
     nbrs = NearestNeighbors(radius=bandwidth, n_jobs=1).fit(X)
-    # print(type(nbrs))
-    # for seed in seeds:
-    #     seed_array = np.zeros((1, n_features))
-    #     i = 0
-    #     for num in seed:
-    #         seed_array[0][i] = num
-    #         i += 1
-    #     print(seed_array)
-    #     fit_result = nbrs.radius_neighbors(seed_array)
-    #     print(fit_result)
-
 
     ##########################################parallel computing############################
     center_intensity_dict = {}
@@ -203,6 +195,8 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,min_bin_freq=1, 
         delayed(_mean_shift_single_seed)
         (seed, X, nbrs, max_iter) for seed in seeds)#
     ##########################################parallel computing############################
+
+    print(all_res)
 
     return cluster_centers, labels
 
