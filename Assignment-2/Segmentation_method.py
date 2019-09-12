@@ -130,7 +130,29 @@ def _mean_shift_single_seed(my_mean, X, nbrs, max_iter):
         mean(center) and the total number of pixels which is in the sphere
     """
     # For each seed, climb gradient until convergence or max_iter
+    n_features = X.shape[1]
+    # for i in range(max_iter):
+    # Find neighbors
+    seed_array = seed_to_array(my_mean, n_features)
+    neighbors = nbrs.radius_neighbors(seed_array, return_distance=False)[0]
 
+    # Calculate centre of gravity
+    mean = np.zeros((1, n_features))
+    for neighbor in neighbors:
+        mean += X[neighbor]
+    mean /= len(neighbors)
+    print(mean)
+
+    return mean
+
+# Since the seed has tuple as key, we need to convert back
+def seed_to_array(seed, n_features):
+    seed_array = np.zeros((1, n_features))
+    i = 0
+    for num in seed:
+        seed_array[0][i] = num
+        i += 1
+    return seed_array
 
 def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,min_bin_freq=1, cluster_all=True, max_iter=300,
                n_jobs=None):
@@ -145,21 +167,31 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,min_bin_freq=1, 
     return:
         cluster_centers <class 'numpy.ndarray'> shape=[n_cluster, n_features] ,labels <class 'list'>, len = n_samples
     """
+    print(X.shape)
 
     if bin_seeding:
         seeds = get_bin_seeds(X, bandwidth)
 
     # find the points within the sphere
     nbrs = NearestNeighbors(radius=bandwidth, n_jobs=1).fit(X)
-    
+    # print(type(nbrs))
+    # for seed in seeds:
+    #     seed_array = np.zeros((1, n_features))
+    #     i = 0
+    #     for num in seed:
+    #         seed_array[0][i] = num
+    #         i += 1
+    #     print(seed_array)
+    #     fit_result = nbrs.radius_neighbors(seed_array)
+    #     print(fit_result)
+
+
     ##########################################parallel computing############################
     center_intensity_dict = {}
     all_res = Parallel(n_jobs=n_jobs)(
         delayed(_mean_shift_single_seed)
         (seed, X, nbrs, max_iter) for seed in seeds)#
     ##########################################parallel computing############################
-
-    print(all_res)
 
     return cluster_centers, labels
 
