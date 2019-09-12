@@ -179,14 +179,11 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,min_bin_freq=1, 
     return:
         cluster_centers <class 'numpy.ndarray'> shape=[n_cluster, n_features] ,labels <class 'list'>, len = n_samples
     """
-    print(X.shape)
     n_samples = X.shape[0]
     n_features = X.shape[1]
 
     if bin_seeding:
         seeds = get_bin_seeds(X, bandwidth)
-
-    print(len(seeds))
 
     # find the points within the sphere
     nbrs = NearestNeighbors(radius=bandwidth, n_jobs=1).fit(X)
@@ -202,15 +199,22 @@ def mean_shift(X, bandwidth=None, seeds=None, bin_seeding=False,min_bin_freq=1, 
     for i in range(len(all_res)):
         cluster_centers[i] = np.asarray(all_res[i][0])
 
-    print(cluster_centers)
-
-    labels = np.zeros(n_samples, dtype=int)
+    labels = [0] * n_samples
     neighborhoods = nbrs.radius_neighbors(cluster_centers, return_distance=False)
     for i in range(len(neighborhoods)):
         for neighbor in neighborhoods[i]:
             labels[neighbor] = i
-    print(labels)
-    print(labels.shape)
+
+    # Replace the original label numbers with unique indices starting from 0
+    i = 0
+    unique_labels_map = {}
+    unique_labels = np.unique(labels)
+    for unique_label in unique_labels:
+        unique_labels_map[unique_label] = i
+        i += 1
+    for i in range(len(labels)):
+        labels[i] = unique_labels_map[labels[i]]
+
     return cluster_centers, labels
 
 def get_bin_seeds(X, bin_size, min_bin_freq=1):
