@@ -85,7 +85,8 @@ def KMeans(data,k):
                     if clusterAssment[m] == i:
                         new_feature += data[m][j]
                         counter += 1
-                new_feature /= counter
+                if counter > 0:
+                    new_feature /= counter
                 new_centroid[j] = new_feature
             if not np.array_equal(new_centroid, centroids[i]):
                 not_converged = True
