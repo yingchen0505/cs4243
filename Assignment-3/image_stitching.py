@@ -70,7 +70,19 @@ def simple_descriptor(patch):
     feature = []
     
     ### YOUR CODE HERE
-    raise NotImplementedError() # Delete this line
+    h = patch.shape[0]
+    w = patch.shape[1]
+    mean = np.mean(patch)
+    sd = np.std(patch)
+    if sd > 0:
+        for hi in range(h):
+            for wi in range(w):
+                feature.append((patch[hi][wi] - mean) / sd)
+    else:
+        for hi in range(h):
+            for wi in range(w):
+                feature.append(patch[hi][wi] - mean)
+
     ### END YOUR CODE
     
     return feature
@@ -125,7 +137,8 @@ def match_descriptors(desc1, desc2, threshold=0.5):
     N = desc2.shape[0]
 
     ### YOUR CODE HERE
-    raise NotImplementedError() # Delete this line
+    
+
     ### END YOUR CODE
     
     return matches
