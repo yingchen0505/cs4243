@@ -136,8 +136,6 @@ def match_descriptors(desc1, desc2, threshold=0.5):
     N = desc2.shape[0]
 
     ### YOUR CODE HERE
-    print(M)
-    print(N)
     dists = cdist(desc1, desc2)
     for Mi in range(M):
         row = dists[Mi]
@@ -151,36 +149,6 @@ def match_descriptors(desc1, desc2, threshold=0.5):
         if closest / second_closest < threshold:
             matches.append([Mi, closest_index])
     matches = np.asarray(matches)
-    # for Mi in range(M):
-    #     dists = {}
-    #     P1 = len(desc1[Mi])
-    #     for Ni in range(N):
-    #         P2 = len(desc2[Ni])
-    #         array = np.asarray(desc1[Mi])
-    #         # array = np.array((1,1), dtype='ndarray')
-    #         print(array.shape)
-    #         print(array)
-    #         array2 = np.array((0), dtype=np.ndarray)
-    #         array2[0] = array
-    #         print(array2)
-    #         print(array2.shape)
-    #         dist = cdist(np.asarray(np.asarray(desc1[Mi])), np.asarray(np.asarray(desc2[Ni])))
-    #         # dist = cdist(np.asarray(desc1[Mi]).reshape(P1, 1), np.asarray(desc2[Ni]).reshape(P2, 1))
-    #         print(dist)
-    #         dists[dist] = Ni
-    #     # dists.sort()
-    #     # print(len(dists))
-    #     closest = np.min(dists.keys())
-    #     Ni = dists[closest]
-    #     dists.pop(closest)
-    #     # closest = min(dists.items(), key=dists.get)
-    #     # print(closest)
-    #     # dists.pop(closest.)
-    #     second_closest = np.min(dists.keys())
-    #     if closest / second_closest < threshold:
-    #         matches.append([Mi, Ni])
-    #
-
 
     ### END YOUR CODE
     
