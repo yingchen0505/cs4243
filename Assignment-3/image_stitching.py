@@ -38,31 +38,41 @@ def harris_corners(img, window_size=3, k=0.04):
     # Moment =
     # print(dx.shape)
     # print(dy.shape)
-    dx2 = pow(dx, 2)
-    dy2 = pow(dy, 2)
-    dxdy = np.dot(dx, dy)
-    # print(dx2.shape)
+    dx2 = dx ** 2
+    dy2 = dy ** 2
+    dxdy = dy * dx
+    # dx2 = pow(dx, 2)
+    # dy2 = pow(dy, 2)
+    # dxdy = np.dot(dx, dy)
+    # # print(dx2.shape)
     # print(dy2.shape)
     # print(dxdy.shape)
     # d_matrix = np.array([[dx2, dxdy], [dxdy, dy2]])
     # print(d_matrix.shape)
     # for x in range(W):
     #     for y in range(H):
-    moment = np.array([[convolve(window, dx2), convolve(window, dxdy)], [convolve(window, dxdy), convolve(window, dy2)]])
-    print(moment.shape)
+    # moment = convolve(d_matrix, window)
+    # moment = np.array([[convolve(window, dx2), convolve(window, dxdy)], [convolve(window, dxdy), convolve(window, dy2)]])
+    # print(moment.shape)
     # print(np.linalg.det(moment).shape)
     # print(np.trace(moment).shape)
-    eigvals, eigvectors = np.linalg.eig(moment)
-    lambda1 = eigvals[0]
-    lambda2 = eigvals[1]
-    print(lambda1.shape)
-    print(lambda2.shape)
-    det_moment = np.dot(lambda1, lambda2)
-    # trace_moment = lambda1 + lambda2
-    print(det_moment.shape)
+    # eigvals, eigvectors = np.linalg.eig(moment)
+    # lambda1 = eigvals[0]
+    # lambda2 = eigvals[1]
+    # print(lambda1.shape)
+    # print(lambda2.shape)
+    # det_moment = np.dot(lambda1, lambda2)
+    # # trace_moment = lambda1 + lambda2
+    # print(det_moment.shape)
     # print(trace_moment.shape)
-    response = np.linalg.det(moment) - k * np.square(np.trace(moment))
-    # response = np.linalg.det(moment) - k * pow(np.trace(moment), 2)
+    A = convolve(dx2, window)
+    B = convolve(dy2, window)
+    C = convolve(dxdy, window)
+    detM = A*B - np.square(C)
+    traceM = A + B
+    response = detM - k * traceM
+    # response = np.linalg.det(moment)
+    # response = np.linalg.det(moment) - k * np.square(np.trace(moment))
     ### END YOUR CODE
 
     return response
