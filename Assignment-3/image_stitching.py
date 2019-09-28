@@ -208,11 +208,12 @@ def ransac(keypoints1, keypoints2, matches, n_iters=200, threshold=20):
     matched1 = pad(keypoints1[matches[:,0]])
     matched2 = pad(keypoints2[matches[:,1]])
 
-    max_inliers = np.zeros(N)
+    max_inliers = np.zeros(N, dtype=int)
     n_inliers = 0
 
     # RANSAC iteration start
     ### YOUR CODE HERE
+    P = keypoints1.shape[1]
     for itr in range(n_iters):
         selected_matches = np.zeros((n_samples, 2), dtype=int)
         selected_matches_indexes = []
@@ -225,19 +226,27 @@ def ransac(keypoints1, keypoints2, matches, n_iters=200, threshold=20):
         # print(keypoints2[match[1]])
         p1 = keypoints1[selected_matches[:, 0]]
         p2 = keypoints2[selected_matches[:, 1]]
-        print(keypoints1.shape)
-        print(keypoints2.shape)
-        print(p1.shape)
-        print(p2.shape)
-        curr_H = np.linalg.lstsq(p2, p1)[0]
-        curr_H[:, 2] = np.array([0, 0, 1])
-        # matrix = fit_affine_matrix(p1, p2)
+        # print(keypoints1.shape)
+        # print(keypoints2.shape)
+        # print(p1.shape)
+        # print(p2.shape)
+        # curr_H = np.linalg.lstsq(p2, p1)[0]
+        curr_H = fit_affine_matrix(p2, p1)
+        # curr_H = np.linalg.lstsq(p2, p1)[0]
+        # curr_H[:, 2] = np.array([0, 0, 1])
+        # # matrix = fit_affine_matrix(p1, p2)
         # matrix = fit_affine_matrix(keypoints1[match[0]], keypoints2[match[1]])
-        curr_max_inliers = np.zeros(N)
+        curr_max_inliers = np.zeros(N, dtype=int)
         curr_n_inliers = 0
         for i in range(len(matches)):
             match = matches[i]
-            sq_diff = np.linalg.norm(keypoints2[match[1]].dot(curr_H), keypoints1[match[0]])
+            # sq_diff = np.linalg.norm(keypoints2[match[1]].dot(curr_H), keypoints1[match[0]])
+            # print(np.dot(keypoints2[match[1]], curr_H).shape)
+            # print(keypoints1[match[0]].shape)
+            sq_diff = np.linalg.norm(np.dot(keypoints2[match[1]], curr_H[:P, :2]) - keypoints1[match[0]])
+            # sq_diff = np.linalg.norm(p2.dot(curr_H), p1)
+            # sq_diff = np.linalg.norm(np.dot(p2, curr_H), p1)
+            # sq_diff = np.linalg.norm(keypoints2[match[1]] * curr_H, keypoints1[match[0]])
             if sq_diff < threshold:
                 curr_max_inliers[i] = 1
                 curr_n_inliers += 1
