@@ -3,6 +3,7 @@ from skimage import filters
 from skimage.feature import corner_peaks
 from scipy.spatial.distance import cdist
 from scipy.ndimage.filters import convolve
+from scipy.ndimage import gaussian_filter
 import math
 import random
 
@@ -36,6 +37,9 @@ def harris_corners(img, window_size=3, k=0.04):
     dy = filters.sobel_h(img)
 
     ### YOUR CODE HERE
+    print(window)
+    window = gaussian_filter(window, 0.1)
+    print(window)
     dx2 = dx ** 2
     dy2 = dy ** 2
     dxdy = dy * dx
@@ -71,20 +75,17 @@ def simple_descriptor(patch):
     feature = []
     
     ### YOUR CODE HERE
-    h = patch.shape[0]
-    w = patch.shape[1]
     mean = np.mean(patch)
     sd = np.std(patch)
     if sd > 0:
-        for hi in range(h):
-            for wi in range(w):
-                feature.append((patch[hi][wi] - mean) / sd)
+        for row in patch:
+            for pixel in row:
+                feature.append((pixel - mean) / sd)
     else:
-        for hi in range(h):
-            for wi in range(w):
-                feature.append(patch[hi][wi] - mean)
+        for row in patch:
+            for pixel in row:
+                feature.append(pixel - mean)
     ### END YOUR CODE
-    
     return feature
 
 
@@ -147,7 +148,7 @@ def match_descriptors(desc1, desc2, threshold=0.5):
                 closest_index = Ni
         row[closest_index] = max(row)
         second_closest = min(row)
-        if closest / second_closest < threshold:
+        if (closest / second_closest) < threshold:
             matches.append([Mi, closest_index])
     matches = np.asarray(matches)
 
@@ -216,28 +217,88 @@ def ransac(keypoints1, keypoints2, matches, n_iters=200, threshold=20):
     H = 0
     P = keypoints1.shape[1]
     for itr in range(n_iters):
-        selected_matches = np.zeros((n_samples, 2), dtype=int)
-        selected_matches_indexes = []
-        for i in range(n_samples):
-            rand = random.randint(0, len(matches) - 1)
-            selected_matches[i] = matches[rand]
-            selected_matches_indexes.append(rand)
-        p1 = keypoints1[selected_matches[:, 0]]
-        p2 = keypoints2[selected_matches[:, 1]]
-        curr_H = fit_affine_matrix(p2, p1)
-        curr_max_inliers = np.zeros(N, dtype=int)
-        curr_n_inliers = 0
-        for i in range(len(matches)):
-            match = matches[i]
-            sq_diff = np.linalg.norm(np.dot(keypoints2[match[1]], curr_H[:P, :2]) - keypoints1[match[0]])
-            if sq_diff < threshold:
-                curr_max_inliers[i] = 1
-                curr_n_inliers += 1
-        if curr_n_inliers > n_inliers:
-            max_inliers = curr_max_inliers
-            n_inliers = curr_n_inliers
+        # selected_matches = np.zeros((n_samples, 2), dtype=int)
+        # selected_matches_indexes = []
+        # for i in range(n_samples):
+        #     rand = random.randint(0, len(matches) - 1)
+        #     selected_matches[i] = matches[rand]
+        #     selected_matches_indexes.append(rand)
+        rand_nums = np.random.randint(N, size=n_samples)
+        # print(rand_nums)
+        p1 = matched1[rand_nums, :]
+        p2 = matched2[rand_nums, :]
+
+        curr_H = np.linalg.lstsq(p2, p1)[0]
+        curr_H[:, 2] = np.array([0, 0, 1])
+
+        p1_estimates = np.dot(p2, curr_H)
+        # p1_estimates = np.matmul(p2, curr_H)
+        diff = p1_estimates - p1
+        # print(p2.shape)
+        # print(curr_H.shape)
+        # diff = np.subtract(p1_estimates, p1)
+        sq_diff = diff ** 2
+        # ssd = sq_diff
+        # print(sq_diff.shape)
+        ssd = np.sum(sq_diff, axis=1)
+        # print(ssd.shape)
+        # print(sum_sqr_diff_between_real_and_estimated)
+        inlier_indice = rand_nums[ssd < threshold]
+        # print(inlier_indice)
+        if np.sum(ssd < threshold) > n_inliers:
+            n_inliers = np.sum(ssd)
+            max_inliers = inlier_indice
             H = curr_H
 
+        # p1 = keypoints1[selected_matches[:, 0], :]
+        # p2 = keypoints2[selected_matches[:, 1], :]
+        # curr_H = fit_affine_matrix(p2, p1)
+        # curr_max_inliers = np.zeros(N, dtype=int)
+        # curr_n_inliers = 0
+        # # for i in range(len(matches)):
+        # # match = matches[i]
+        # i = 0
+        # for each in np.matmul(p2, curr_H) - p1:
+        #     sq_diff = np.linalg.norm(each)
+        #     if sq_diff < threshold:
+        #         print(sq_diff)
+        #         curr_max_inliers[i] = 1
+        #         curr_n_inliers += 1
+        #     i += 1
+
+    # sq_diff = np.linalg.norm(np.matmul(p2, curr_H) - p1)
+        # sq_diff = np.linalg.norm(np.matmul(keypoints2[match[1]], curr_H[:P, :2]) - keypoints1[match[0]])
+        # sq_diff = np.linalg.norm(np.dot(keypoints2[match[1]], curr_H[:P, :2]) - keypoints1[match[0]])
+        # for each in sq_diff:
+        #     if each < threshold:
+        #         curr_max_inliers[i] = 1
+        #         curr_n_inliers += 1
+        # inliers = rand_nums[]
+        # curr_n_inliers =
+        # if curr_n_inliers > n_inliers:
+        #     max_inliers = curr_max_inliers
+        #     n_inliers = curr_n_inliers
+        #     H = curr_H
+    # for iter in range(n_iters):
+    #     random_indice = np.random.randint(N, size=n_samples)
+    #     randomly_picked_matches_1 = matched1[random_indice, :]
+    #     randomly_picked_matches_2 = matched2[random_indice, :]
+    #     # print(randomly_picked_matches_1.shape)
+    #     # print(randomly_picked_matches_2.shape)
+    #     model_based_on_sample = np.linalg.lstsq(randomly_picked_matches_2, randomly_picked_matches_1)[0]
+    #     model_based_on_sample[:, 2] = np.array([0, 0, 1])
+    #     # print(model_based_on_sample)
+    #     estimated_randomly_picked_matches_1 = np.matmul(randomly_picked_matches_2, model_based_on_sample)
+    #     diff_between_real_and_estimated = np.subtract(estimated_randomly_picked_matches_1, randomly_picked_matches_1)
+    #     sqr_diff_between_real_and_estimated = np.multiply(diff_between_real_and_estimated,
+    #                                                       diff_between_real_and_estimated)
+    #     sum_sqr_diff_between_real_and_estimated = np.sum(sqr_diff_between_real_and_estimated, axis=1)
+    #     # print(sum_sqr_diff_between_real_and_estimated)
+    #     inlier_indice = random_indice[sum_sqr_diff_between_real_and_estimated < threshold]
+    #     if np.sum(sum_sqr_diff_between_real_and_estimated < threshold) > n_inliers:
+    #         n_inliers = np.sum(sum_sqr_diff_between_real_and_estimated)
+    #         max_inliers = inlier_indice
+    #         H = model_based_on_sample
     ### END YOUR CODE
     
     return H, matches[max_inliers]
