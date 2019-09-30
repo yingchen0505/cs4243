@@ -37,9 +37,6 @@ def harris_corners(img, window_size=3, k=0.04):
     dy = filters.sobel_h(img)
 
     ### YOUR CODE HERE
-    print(window)
-    window = gaussian_filter(window, 0.1)
-    print(window)
     dx2 = dx ** 2
     dy2 = dy ** 2
     dxdy = dy * dx
@@ -283,7 +280,32 @@ def sift_descriptor(patch):
     histogram = np.zeros((4,4,8))
     
     ### YOUR CODE HERE
-    raise NotImplementedError() # Delete this line
+    # print(dx.shape)
+    # print(np.arctan2(dy, dx).shape)
+    # print(dx)
+    # print(dy.shape)
+    # print(dy)
+    num_directions = 8
+    cell_length = (int)(patch.shape[0] / 4)
+    # hist = np.histogram(np.arctan2(dx, dy), bins=num_directions)[0]
+    # print(hist)
+    feature = []
+    # feature = np.zeros((cell_length, cell_length, num_directions))
+    for i in range(cell_length):
+        for j in range(cell_length):
+            dx_range = dx[i*cell_length: (i+1)*cell_length - 1, j*cell_length: (j+1)*cell_length-1]
+            dy_range = dy[i*cell_length: (i+1)*cell_length - 1, j*cell_length: (j+1)*cell_length-1]
+            hist = np.histogram(np.arctan2(dx_range, dy_range), bins=num_directions)[0]
+            # print(len(hist))
+            # print(np.asarray(hist).shape)
+            # print(hist.tolist().dtype)
+            # print(feature.dtype)
+            feature.extend(hist.tolist())
+            # print(len(feature))
+            # feature[i][j] = np.asarray(hist)
+    feature /= np.linalg.norm(feature)
+    # feature.reshape((cell_length*cell_length*num_directions))
+    # print(len(feature))
     ### END YOUR CODE
-    
+    # feature = []
     return feature
