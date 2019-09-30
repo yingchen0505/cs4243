@@ -4,6 +4,7 @@ from skimage.feature import corner_peaks
 from scipy.spatial.distance import cdist
 from scipy.ndimage.filters import convolve
 from scipy.ndimage import gaussian_filter
+from sklearn import preprocessing
 import math
 import random
 
@@ -287,9 +288,9 @@ def sift_descriptor(patch):
         for j in range(cell_length):
             dx_range = dx[i*cell_length: (i+1)*cell_length - 1, j*cell_length: (j+1)*cell_length-1]
             dy_range = dy[i*cell_length: (i+1)*cell_length - 1, j*cell_length: (j+1)*cell_length-1]
-            hist = np.histogram(np.arctan2(dx_range, dy_range), bins=num_directions)[0]
+            hist = np.histogram(preprocessing.normalize(np.arctan2(dx_range, dy_range)), bins=num_directions)[0]
             feature.extend(hist.tolist())
-    # feature /= np.linalg.norm(feature)
+    # print(feature)
     ### END YOUR CODE
 
     return feature
