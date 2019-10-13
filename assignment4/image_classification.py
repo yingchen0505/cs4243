@@ -61,10 +61,17 @@ def build_vocabulary(image_paths, vocab_size):
     total_SIFT_features = np.zeros((20*len(image_paths), dim))
 
     #############################################################################
-    # TODO: YOUR CODE HERE                                                      #
+    for index, image_path in enumerate(image_paths):
+        img = load_image_gray(image_path)
+        frames, descriptors = vlfeat.sift.dsift(img)
+        random_indices = np.random.randint(len(frames), size=20)
+        total_SIFT_features[index*20: (index+1)*20, :] = descriptors[random_indices]
+
+    vocab = vlfeat.kmeans.kmeans(total_SIFT_features, vocab_size)
+
     #############################################################################
 
-    raise NotImplementedError('`build_vocabulary` function needs to be implemented')
+    # raise NotImplementedError('`build_vocabulary` function needs to be implemented')
 
     #############################################################################
     #                             END OF YOUR CODE                              #
