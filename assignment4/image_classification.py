@@ -142,14 +142,16 @@ def bags_of_sifts(image_paths, vocab_filename):
         print(image_path)
         img = load_image_gray(image_path)
         frames, descriptors = vlfeat.sift.dsift(img)
-        random_indices = np.random.randint(len(frames), size=dim)
+        random_indices = np.random.randint(len(frames), size=dim*5)
         total_features = descriptors[random_indices]
         D = cdist(total_features, vocab)
-        histogram = np.zeros(dim)
-        idx = np.argmin(D, axis=0)
-        histogram[idx] += 1
-        print(histogram)
+        idx = np.argmin(D, axis=1)
+        # print(idx.shape)
+        # print(idx)
+        histogram = np.histogram(idx, bins=dim, range=(0, dim-1))[0]
+        # print(histogram)
         feats[index] = histogram
+        break
 
     #############################################################################
 
