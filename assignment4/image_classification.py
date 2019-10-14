@@ -287,6 +287,7 @@ def bags_of_sifts_spm(image_paths, vocab_filename, depth):
         levels[i] = int(np.power(4, i))
     dim = len(vocab) * np.sum(levels)
     feats = np.zeros((len(image_paths), dim))
+    feats_index = 0
 
     for index, image_path in enumerate(image_paths):
         print(image_path)
@@ -300,14 +301,15 @@ def bags_of_sifts_spm(image_paths, vocab_filename, depth):
                 y = int(i % side_length)
                 # print('x: ' + str(x) + ' y: ' + str(y))
                 frames, descriptors = vlfeat.sift.dsift(img[y*step_y: (y+1)*step_y, x*step_x: (x+1)*step_x], step=10, fast=True)
+                random_indices = np.random.randint(len(frames), size=int(dim/level))
+                total_features = descriptors[random_indices]
+                D = cdist(total_features, vocab)
+                idx = np.argmin(D, axis=1)
+                histogram = np.histogram(idx, bins=vocab_size, range=(0, vocab_size - 1))[0]
+                histogram = histogram / np.linalg.norm(histogram)
+                feats[index][feats_index: feats_index + vocab_size] = histogram * weights[index_level]
+                feats_index += vocab_size
             side_length = level
-            # random_indices = np.random.randint(len(frames), size=dim)
-            # total_features = descriptors[random_indices]
-            # D = cdist(total_features, vocab)
-            # idx = np.argmin(D, axis=1)
-            # histogram = np.histogram(idx, bins=dim, range=(0, dim - 1))[0]
-            # histogram = histogram / np.linalg.norm(histogram)
-            # feats[index] = histogram
 
         break
 
