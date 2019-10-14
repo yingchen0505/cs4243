@@ -198,10 +198,12 @@ def nearest_neighbor_classifier(train_image_feats, train_labels, test_image_feat
     test_labels = []
 
     #############################################################################
-    # TODO: YOUR CODE HERE                                                      #
+    distances = cdist(test_image_feats, train_image_feats)
+    indices = np.argmin(distances, axis=1)
+    test_labels = np.asarray(train_labels)[indices]
     #############################################################################
 
-    raise NotImplementedError('`nearest_neighbor_classify` function needs to be implemented')
+    # raise NotImplementedError('`nearest_neighbor_classify` function needs to be implemented')
 
     #############################################################################
     #                             END OF YOUR CODE                              #
