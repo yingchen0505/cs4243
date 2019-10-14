@@ -281,27 +281,35 @@ def bags_of_sifts_spm(image_paths, vocab_filename, depth):
     #############################################################################
     weights = np.zeros(depth)
     weights[0] = 1 / np.power(2, depth-1)
-    levels = np.ones(depth)
+    levels = np.ones(depth, dtype=int)
     for i in range(1, depth):
         weights[i] = (1 / np.power(2, depth - i))
-        levels[i] = np.power(4, i)
-    # print(weights)
-    # print(levels)
+        levels[i] = int(np.power(4, i))
     dim = len(vocab) * np.sum(levels)
-    # print(dim)
     feats = np.zeros((len(image_paths), dim))
-    #
-    # for index, image_path in enumerate(image_paths):
-    #     print(image_path)
-    #     img = load_image_gray(image_path)
-    #     frames, descriptors = vlfeat.sift.dsift(img)
-    #     random_indices = np.random.randint(len(frames), size=dim * 5)
-    #     total_features = descriptors[random_indices]
-    #     D = cdist(total_features, vocab)
-    #     idx = np.argmin(D, axis=1)
-    #     histogram = np.histogram(idx, bins=dim, range=(0, dim - 1))[0]
-    #     histogram = histogram / np.linalg.norm(histogram)
-    #     feats[index] = histogram
+
+    for index, image_path in enumerate(image_paths):
+        print(image_path)
+        img = load_image_gray(image_path)
+        side_length = 1
+        for index_level, level in enumerate(levels):
+            step_x = int(img.shape[1] / level)
+            step_y = int(img.shape[0] / level)
+            for i in range(level):
+                x = int(i / side_length)
+                y = int(i % side_length)
+                # print('x: ' + str(x) + ' y: ' + str(y))
+                frames, descriptors = vlfeat.sift.dsift(img[y*step_y: (y+1)*step_y, x*step_x: (x+1)*step_x], step=10, fast=True)
+            side_length = level
+            # random_indices = np.random.randint(len(frames), size=dim)
+            # total_features = descriptors[random_indices]
+            # D = cdist(total_features, vocab)
+            # idx = np.argmin(D, axis=1)
+            # histogram = np.histogram(idx, bins=dim, range=(0, dim - 1))[0]
+            # histogram = histogram / np.linalg.norm(histogram)
+            # feats[index] = histogram
+
+        break
 
     #############################################################################
 
