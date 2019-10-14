@@ -238,10 +238,12 @@ def svm_classify(train_image_feats, train_labels, test_image_feats):
     test_labels = []
 
     #############################################################################
-    # TODO: YOUR CODE HERE                                                      #
+    model = SVC(gamma='auto')
+    model.fit(train_image_feats, train_labels)
+    test_labels = model.predict(test_image_feats)
     #############################################################################
     
-    raise NotImplementedError('`svm_classify` function needs to be implemented')
+    # raise NotImplementedError('`svm_classify` function needs to be implemented')
 
     #############################################################################
     #                             END OF YOUR CODE                              #
