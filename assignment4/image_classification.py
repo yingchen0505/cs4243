@@ -274,15 +274,38 @@ def bags_of_sifts_spm(image_paths, vocab_filename, depth):
     """
     with open(vocab_filename, 'rb') as f:
         vocab = pickle.load(f)
-    
+
     vocab_size = vocab.shape[0]
     feats = []
 
     #############################################################################
-    # TODO: YOUR CODE HERE                                                      #
+    weights = np.zeros(depth)
+    weights[0] = 1 / np.power(2, depth-1)
+    levels = np.ones(depth)
+    for i in range(1, depth):
+        weights[i] = (1 / np.power(2, depth - i))
+        levels[i] = np.power(4, i)
+    # print(weights)
+    # print(levels)
+    dim = len(vocab) * np.sum(levels)
+    # print(dim)
+    feats = np.zeros((len(image_paths), dim))
+    #
+    # for index, image_path in enumerate(image_paths):
+    #     print(image_path)
+    #     img = load_image_gray(image_path)
+    #     frames, descriptors = vlfeat.sift.dsift(img)
+    #     random_indices = np.random.randint(len(frames), size=dim * 5)
+    #     total_features = descriptors[random_indices]
+    #     D = cdist(total_features, vocab)
+    #     idx = np.argmin(D, axis=1)
+    #     histogram = np.histogram(idx, bins=dim, range=(0, dim - 1))[0]
+    #     histogram = histogram / np.linalg.norm(histogram)
+    #     feats[index] = histogram
+
     #############################################################################
 
-    raise NotImplementedError('`get_bags_of_sifts` function needs to be implemented')
+    # raise NotImplementedError('`get_bags_of_sifts` function needs to be implemented')
 
     #############################################################################
     #                             END OF YOUR CODE                              #
