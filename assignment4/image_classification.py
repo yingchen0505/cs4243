@@ -146,13 +146,9 @@ def bags_of_sifts(image_paths, vocab_filename):
         total_features = descriptors[random_indices]
         D = cdist(total_features, vocab)
         idx = np.argmin(D, axis=1)
-        # print(idx.shape)
-        # print(idx)
         histogram = np.histogram(idx, bins=dim, range=(0, dim-1))[0]
-        # print(histogram)
+        histogram = histogram / np.linalg.norm(histogram)
         feats[index] = histogram
-        break
-
     #############################################################################
 
     # raise NotImplementedError('`get_bags_of_sifts` function needs to be implemented')
