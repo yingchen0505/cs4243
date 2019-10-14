@@ -287,10 +287,10 @@ def bags_of_sifts_spm(image_paths, vocab_filename, depth):
         levels[i] = int(np.power(4, i))
     dim = len(vocab) * np.sum(levels)
     feats = np.zeros((len(image_paths), dim))
-    feats_index = 0
 
     for index, image_path in enumerate(image_paths):
         print(image_path)
+        feats_index = 0
         img = load_image_gray(image_path)
         side_length = 1
         for index_level, level in enumerate(levels):
@@ -309,10 +309,8 @@ def bags_of_sifts_spm(image_paths, vocab_filename, depth):
                 histogram = histogram / np.linalg.norm(histogram)
                 feats[index][feats_index: feats_index + vocab_size] = histogram * weights[index_level]
                 feats_index += vocab_size
+            feats[index] = feats[index] / np.linalg.norm(feats[index])
             side_length = level
-
-        break
-
     #############################################################################
 
     # raise NotImplementedError('`get_bags_of_sifts` function needs to be implemented')
