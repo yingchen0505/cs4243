@@ -135,10 +135,25 @@ def bags_of_sifts(image_paths, vocab_filename):
     feats = []
 
     #############################################################################
-    # TODO: YOUR CODE HERE                                                      #
+    dim = len(vocab)
+    feats = np.zeros((len(image_paths), dim))
+
+    for index, image_path in enumerate(image_paths):
+        print(image_path)
+        img = load_image_gray(image_path)
+        frames, descriptors = vlfeat.sift.dsift(img)
+        random_indices = np.random.randint(len(frames), size=dim)
+        total_features = descriptors[random_indices]
+        D = cdist(total_features, vocab)
+        histogram = np.zeros(dim)
+        idx = np.argmin(D, axis=0)
+        histogram[idx] += 1
+        print(histogram)
+        feats[index] = histogram
+
     #############################################################################
 
-    raise NotImplementedError('`get_bags_of_sifts` function needs to be implemented')
+    # raise NotImplementedError('`get_bags_of_sifts` function needs to be implemented')
 
     #############################################################################
     #                             END OF YOUR CODE                              #
