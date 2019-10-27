@@ -32,15 +32,19 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
     
     while True:
         print('completed_iterations = ' + str(completed_iterations))
-        r,c,w,h = track_window
-        # c,r,w,h = track_window
+        # r,c,w,h = track_window
+        x,y,w,h = track_window
         ### YOUR CODE HERE
-        print('c = ' + str(c) + ' r = ' + str(r))
-        image_section = dst[r - h: r, c: c + w]
+        print('x = ' + str(x) + ' y = ' + str(y))
+        image_section = dst[y: y + h, x: x + w]
+        # image_section = dst[r - h: r, c: c + w]
+        plt.imshow(image_section)
+        plt.show()
         print(image_section.shape)
         # if(image_section.shape[0] < h):
         #     return track_window
-        my_old_mean = np.array([r - h/2, c + w/2])
+        my_old_mean = np.array([x + w/2, y + h/2])
+        # my_old_mean = np.array([r - h/2, c + w/2])
         label = np.ones(image_section.shape, dtype=int)
         # label = np.zeros(dst.shape, dtype=int)
         # label[r - h: r, c: c + w].fill(1)
@@ -51,24 +55,33 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
         # my_mean = np.array((my_mean[1], my_mean[0]))
         print('centroid = ' + str(my_mean))
 
-        my_mean = np.array([my_mean[0] + r - h, my_mean[1] + c])
-        c_new = int(my_mean[1] - w/2)
-        r_new = int(my_mean[0] + h/2)
-        ### END YOUR CODE
-        track_window = (r_new,c_new,w,h)
+        my_mean = np.array([my_mean[1] + x, my_mean[0] + y])
+        # my_mean = np.array([my_mean[0] + r - h, my_mean[1] + c])
+        c_new = int(my_mean[1] - h/2)
+        r_new = int(my_mean[0] - w/2)
+        # c_new = int(my_mean[1] - w/2)
+        # r_new = int(my_mean[0] + h/2)
+        # ### END YOUR CODE
 
         fig, ax = plt.subplots()
-        ax.axis('off')
+        ax.axis('on')
         im = ax.imshow(dst)
         x, y, w, h = track_window
         plt.imshow(dst)
         ax.add_patch(Rectangle((x, y), w, h, linewidth=3,
-                                      edgecolor='r', facecolor='none'))
+                                      edgecolor='g', facecolor='none'))
+        ax.add_patch(Circle(np.array((x, y)), color='g'))
+        track_window = (r_new,c_new,w,h)
+        x, y, w, h = track_window
+        ax.add_patch(Rectangle((x, y), w, h, linewidth=3,
+                               edgecolor='r', facecolor='none'))
         inversed_centroid = np.array((properties[0].weighted_centroid[1], properties[0].weighted_centroid[0]))
         print(inversed_centroid)
-        ax.add_patch(Circle(inversed_centroid))
+        # ax.add_patch(Circle(inversed_centroid))
         inversed_mean = np.array((my_mean[1], my_mean[0]))
-        ax.add_patch(Circle(inversed_mean))
+        # ax.add_patch(Circle(inversed_mean))
+        ax.add_patch(Circle(my_old_mean, color='y'))
+        ax.add_patch(Circle(my_mean, color='b'))
         ax.add_patch(Circle(np.array((r_new, c_new))))
         plt.show()
 
