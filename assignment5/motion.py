@@ -3,6 +3,8 @@ import os
 from skimage.transform import pyramid_gaussian
 from skimage.filters import sobel_h, sobel_v, gaussian
 from skimage.feature import corner_harris, corner_peaks
+# import matplotlib.pyplot as plt
+from skimage.measure import regionprops
 
 def listdir(path, list_name):
     for file in os.listdir(path):
@@ -27,14 +29,31 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
     completed_iterations = 0
     
     while True:
-        c,r,w,h = track_window
+        r,c,w,h = track_window
+        # c,r,w,h = track_window
         ### YOUR CODE HERE
-        my_old_mean = np.array([c, r])
-        c_new = 0
-        r_new = 0
-        my_mean = np.array([c_new, r_new])
+        print('c = ' + str(c) + ' r = ' + str(r))
+        image_section = dst[r - h: r, c: c + w]
+        print(image_section.shape)
+        # image_section = dst[c - h: c, r: r + w]
+        my_old_mean = np.array([r - h/2, c + w/2])
+        label = np.ones(image_section.shape, dtype=int)
+        # label = np.zeros(dst.shape, dtype=int)
+        # label[c - h: c, r: r + w].fill(1)
+        properties = regionprops(label, image_section)
+        # properties = regionprops(label, dst)
+        # print(label[c - h: c, r: r + w])
+        print(len(properties))
+        my_mean = properties[0].weighted_centroid
+        print('centroid = ' + str(my_mean))
+        # plt.imshow(image_section)
+        # plt.show()
+        my_mean = np.array([my_mean[0] + r - h, my_mean[1] + c])
+        c_new = int(my_mean[1] - w/2)
+        r_new = int(my_mean[0] + h/2)
         ### END YOUR CODE
-        track_window = (c_new,r_new,w,h)
+        track_window = (r_new,c_new,w,h)
+        # track_window = (c_new,r_new,w,h)
         if np.linalg.norm(my_mean - my_old_mean) < stop_thresh or completed_iterations == max_iter:
             return track_window
         completed_iterations += 1
