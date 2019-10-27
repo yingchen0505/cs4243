@@ -3,7 +3,9 @@ import os
 from skimage.transform import pyramid_gaussian
 from skimage.filters import sobel_h, sobel_v, gaussian
 from skimage.feature import corner_harris, corner_peaks
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+from matplotlib.patches import Circle
 from skimage.measure import regionprops
 
 def listdir(path, list_name):
@@ -29,32 +31,49 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
     completed_iterations = 0
     
     while True:
+        print('completed_iterations = ' + str(completed_iterations))
         r,c,w,h = track_window
         # c,r,w,h = track_window
         ### YOUR CODE HERE
         print('c = ' + str(c) + ' r = ' + str(r))
         image_section = dst[r - h: r, c: c + w]
         print(image_section.shape)
-        # image_section = dst[c - h: c, r: r + w]
+        # if(image_section.shape[0] < h):
+        #     return track_window
         my_old_mean = np.array([r - h/2, c + w/2])
         label = np.ones(image_section.shape, dtype=int)
         # label = np.zeros(dst.shape, dtype=int)
-        # label[c - h: c, r: r + w].fill(1)
+        # label[r - h: r, c: c + w].fill(1)
         properties = regionprops(label, image_section)
         # properties = regionprops(label, dst)
-        # print(label[c - h: c, r: r + w])
         print(len(properties))
         my_mean = properties[0].weighted_centroid
+        # my_mean = np.array((my_mean[1], my_mean[0]))
         print('centroid = ' + str(my_mean))
-        # plt.imshow(image_section)
-        # plt.show()
+
         my_mean = np.array([my_mean[0] + r - h, my_mean[1] + c])
         c_new = int(my_mean[1] - w/2)
         r_new = int(my_mean[0] + h/2)
         ### END YOUR CODE
         track_window = (r_new,c_new,w,h)
+
+        fig, ax = plt.subplots()
+        ax.axis('off')
+        im = ax.imshow(dst)
+        x, y, w, h = track_window
+        plt.imshow(dst)
+        ax.add_patch(Rectangle((x, y), w, h, linewidth=3,
+                                      edgecolor='r', facecolor='none'))
+        inversed_centroid = np.array((properties[0].weighted_centroid[1], properties[0].weighted_centroid[0]))
+        print(inversed_centroid)
+        ax.add_patch(Circle(inversed_centroid))
+        inversed_mean = np.array((my_mean[1], my_mean[0]))
+        ax.add_patch(Circle(inversed_mean))
+        ax.add_patch(Circle(np.array((r_new, c_new))))
+        plt.show()
+
         # track_window = (c_new,r_new,w,h)
-        if np.linalg.norm(my_mean - my_old_mean) < stop_thresh or completed_iterations == max_iter:
+        if np.linalg.norm(my_mean - my_old_mean) < stop_thresh or completed_iterations >= max_iter:
             return track_window
         completed_iterations += 1
   
