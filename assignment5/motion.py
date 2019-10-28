@@ -318,9 +318,28 @@ def IoU(bbox1, bbox2):
     """
     x1, y1, w1, h1 = bbox1
     x2, y2, w2, h2 = bbox2
-    score = 0
+    score = 0.0
     ### YOUR CODE HERE
-    
+    bottom_right1 = np.array((x1 + w1, y1 + h1))
+    bottom_right2 = np.array((x2 + w2, y2 + h2))
+    x_max = max(bottom_right1[0], bottom_right2[0])
+    y_max = max(bottom_right1[1], bottom_right2[1])
+    field = np.zeros((y_max, x_max), dtype=int)
+    field[y1: bottom_right1[1], x1: bottom_right2[0]] = 1
+    field[y2: bottom_right2[1], x2: bottom_right2[0]] += 2
+    properties = regionprops(field)
+
+    if 3 > len(properties) > 0:
+        return 0.0
+
+    elif len(properties) == 0:
+        return 1.0
+
+    else:
+        intersection = properties[2].area
+        union = properties[0].area + properties[1].area + properties[2].area
+        score = float(intersection) / float(union)
+
     ### END YOUR CODE
 
     return score
