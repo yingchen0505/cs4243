@@ -31,11 +31,11 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
     completed_iterations = 0
     
     while True:
-        print('completed_iterations = ' + str(completed_iterations))
+        # print('completed_iterations = ' + str(completed_iterations))
         # r,c,w,h = track_window
         x,y,w,h = track_window
         ### YOUR CODE HERE
-        print('x = ' + str(x) + ' y = ' + str(y))
+        # print('x = ' + str(x) + ' y = ' + str(y))
         image_section = dst[y: y + h, x: x + w]
         # image_section = dst[r - h: r, c: c + w]
         # plt.imshow(image_section)
@@ -50,10 +50,10 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
         # label[r - h: r, c: c + w].fill(1)
         properties = regionprops(label, image_section)
         # properties = regionprops(label, dst)
-        print(len(properties))
+        # print(len(properties))
         my_mean = properties[0].weighted_centroid
         # my_mean = np.array((my_mean[1], my_mean[0]))
-        print('centroid = ' + str(my_mean))
+        # print('centroid = ' + str(my_mean))
 
         my_mean = np.array([my_mean[1] + x, my_mean[0] + y])
         # my_mean = np.array([my_mean[0] + r - h, my_mean[1] + c])
@@ -325,20 +325,24 @@ def IoU(bbox1, bbox2):
     x_max = max(bottom_right1[0], bottom_right2[0])
     y_max = max(bottom_right1[1], bottom_right2[1])
     field = np.zeros((y_max, x_max), dtype=int)
-    field[y1: bottom_right1[1], x1: bottom_right2[0]] = 1
+    field[y1: bottom_right1[1], x1: bottom_right1[0]] = 1
     field[y2: bottom_right2[1], x2: bottom_right2[0]] += 2
     properties = regionprops(field)
 
-    if 3 > len(properties) > 0:
-        return 0.0
+    intersection = 0.0
+    union = 0.0
+    for property in properties:
+        if property.label == 1 or property.label == 2:
+            union += property.area
 
-    elif len(properties) == 0:
+        elif property.label == 3:
+            intersection += property.area
+            union += property.area
+
+    if union <= 0.0:
         return 1.0
 
-    else:
-        intersection = properties[2].area
-        union = properties[0].area + properties[1].area + properties[2].area
-        score = float(intersection) / float(union)
+    score = float(intersection) / float(union)
 
     ### END YOUR CODE
 
