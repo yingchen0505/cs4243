@@ -38,9 +38,9 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
         print('x = ' + str(x) + ' y = ' + str(y))
         image_section = dst[y: y + h, x: x + w]
         # image_section = dst[r - h: r, c: c + w]
-        plt.imshow(image_section)
-        plt.show()
-        print(image_section.shape)
+        # plt.imshow(image_section)
+        # plt.show()
+        # print(image_section.shape)
         # if(image_section.shape[0] < h):
         #     return track_window
         my_old_mean = np.array([x + w/2, y + h/2])
@@ -57,33 +57,28 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
 
         my_mean = np.array([my_mean[1] + x, my_mean[0] + y])
         # my_mean = np.array([my_mean[0] + r - h, my_mean[1] + c])
-        c_new = int(my_mean[1] - h/2)
-        r_new = int(my_mean[0] - w/2)
+        c_new = max(int(my_mean[1] - h/2), 0)
+        r_new = max(int(my_mean[0] - w/2), 0)
         # c_new = int(my_mean[1] - w/2)
         # r_new = int(my_mean[0] + h/2)
         # ### END YOUR CODE
 
-        fig, ax = plt.subplots()
-        ax.axis('on')
-        im = ax.imshow(dst)
-        x, y, w, h = track_window
-        plt.imshow(dst)
-        ax.add_patch(Rectangle((x, y), w, h, linewidth=3,
-                                      edgecolor='g', facecolor='none'))
-        ax.add_patch(Circle(np.array((x, y)), color='g'))
         track_window = (r_new,c_new,w,h)
-        x, y, w, h = track_window
-        ax.add_patch(Rectangle((x, y), w, h, linewidth=3,
-                               edgecolor='r', facecolor='none'))
-        inversed_centroid = np.array((properties[0].weighted_centroid[1], properties[0].weighted_centroid[0]))
-        print(inversed_centroid)
-        # ax.add_patch(Circle(inversed_centroid))
-        inversed_mean = np.array((my_mean[1], my_mean[0]))
-        # ax.add_patch(Circle(inversed_mean))
-        ax.add_patch(Circle(my_old_mean, color='y'))
-        ax.add_patch(Circle(my_mean, color='b'))
-        ax.add_patch(Circle(np.array((r_new, c_new))))
-        plt.show()
+        if r_new <= 0 or c_new <= 0:
+            fig, ax = plt.subplots()
+            ax.axis('on')
+            im = ax.imshow(dst)
+            plt.imshow(dst)
+            ax.add_patch(Rectangle((x, y), w, h, linewidth=3,
+                                          edgecolor='g', facecolor='none'))
+            ax.add_patch(Circle(np.array((x, y)), color='g'))
+
+            ax.add_patch(Rectangle((r_new, c_new), w, h, linewidth=3,
+                                   edgecolor='r', facecolor='none'))
+            ax.add_patch(Circle(my_old_mean, color='y'))
+            ax.add_patch(Circle(my_mean, color='b'))
+            ax.add_patch(Circle(np.array((r_new, c_new))))
+            plt.show()
 
         # track_window = (c_new,r_new,w,h)
         if np.linalg.norm(my_mean - my_old_mean) < stop_thresh or completed_iterations >= max_iter:
