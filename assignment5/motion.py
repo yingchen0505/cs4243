@@ -144,7 +144,7 @@ def iterative_lucas_kanade(img1, img2, keypoints,
             A[:, 1] = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
             AT = np.transpose(A)
             G = np.linalg.inv(np.matmul(AT, A))
-            gx, gy = G
+            # gy, gx = G
             G_inv = np.linalg.inv(G)
             # print("don't exist: " + str(G_inv))
         else:
@@ -166,10 +166,17 @@ def iterative_lucas_kanade(img1, img2, keypoints,
             
             # TODO: Compute bk and vk = inv(G) x bk
             ### YOUR CODE HERE
-            It = img2 - img1
-            # Ik =
-            bk = It[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape((window_size * window_size))
+            Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
+            # Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
+            print(Ik.shape)
+            bk = np.zeros((2, 0))
+            bk[0] = np.dot(Ik, Ix[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1])
+            bk[1] = np.dot(Ik, Iy[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1])
+            # bk = Ik[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape((window_size * window_size))
+            # bk = np.matmul(AT, bk)
+            # print(AT.shape)
             vk = np.matmul(G_inv, bk)
+            # print(vk)
             ### END YOUR CODE
 
             # Update flow vector by vk
