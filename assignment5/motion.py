@@ -138,23 +138,12 @@ def iterative_lucas_kanade(img1, img2, keypoints,
        
         # TODO: Compute inverse of G at point (x1, y1)
         ### YOUR CODE HERE
-        if gy == 0 and gx == 0:
-            A = np.zeros((window_size * window_size, 2), dtype=float)
-            A[:, 0] = Ix[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
-            A[:, 1] = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
-            AT = np.transpose(A)
-            G = np.linalg.inv(np.matmul(AT, A))
-            # gy, gx = G
-            G_inv = np.linalg.inv(G)
-            # print("don't exist: " + str(G_inv))
-        else:
-            G_inv = np.linalg.inv(np.array(gy, gx))
-            # print("exist: " + str(G_inv))
-        # b = It[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
-        # ATA_inverse = np.linalg.inv(np.matmul(AT, A))
-        # ATb = np.matmul(AT, b)
-        # x = np.matmul(ATA_inverse, ATb)
-        # flow_vectors.append(x)
+        A = np.zeros((window_size * window_size, 2), dtype=float)
+        A[:, 0] = Ix[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
+        A[:, 1] = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
+        AT = np.transpose(A)
+        G = np.linalg.inv(np.matmul(AT, A))
+        G_inv = np.linalg.inv(G)
 
         ### END YOUR CODE
 
@@ -168,17 +157,10 @@ def iterative_lucas_kanade(img1, img2, keypoints,
             ### YOUR CODE HERE
             Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
             Ik = Ik.reshape(window_size * window_size)
-            # Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
-            # print(Ik.shape)
             bk = np.zeros(2)
-            # print(np.dot(Ik, Ix[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]).shape)
             bk[0] = np.matmul(Ik, Ix[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape(window_size * window_size))
             bk[1] = np.matmul(Ik, Iy[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape(window_size * window_size))
-            # bk = Ik[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape((window_size * window_size))
-            # bk = np.matmul(AT, bk)
-            # print(AT.shape)
             vk = np.matmul(G_inv, bk)
-            # print(vk.shape)
             ### END YOUR CODE
 
             # Update flow vector by vk
