@@ -88,8 +88,10 @@ def lucas_kanade(img1, img2, keypoints, window_size=9):
         A = np.zeros((window_size * window_size, 2), dtype=float)
         A[:, 0] = Ix[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
         A[:, 1] = Iy[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
-        print(A)
-
+        AT = np.transpose(A)
+        b = It[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
+        print(AT)
+        print(b)
         ### END YOUR CODE
 
     flow_vectors = np.array(flow_vectors)
