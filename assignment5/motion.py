@@ -167,16 +167,18 @@ def iterative_lucas_kanade(img1, img2, keypoints,
             # TODO: Compute bk and vk = inv(G) x bk
             ### YOUR CODE HERE
             Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
+            Ik = Ik.reshape(window_size * window_size)
             # Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
-            print(Ik.shape)
-            bk = np.zeros((2, 0))
-            bk[0] = np.dot(Ik, Ix[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1])
-            bk[1] = np.dot(Ik, Iy[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1])
+            # print(Ik.shape)
+            bk = np.zeros(2)
+            # print(np.dot(Ik, Ix[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]).shape)
+            bk[0] = np.matmul(Ik, Ix[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape(window_size * window_size))
+            bk[1] = np.matmul(Ik, Iy[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape(window_size * window_size))
             # bk = Ik[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape((window_size * window_size))
             # bk = np.matmul(AT, bk)
             # print(AT.shape)
             vk = np.matmul(G_inv, bk)
-            # print(vk)
+            # print(vk.shape)
             ### END YOUR CODE
 
             # Update flow vector by vk
