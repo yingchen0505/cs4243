@@ -209,9 +209,11 @@ def compute_error(patch1, patch2):
         error - Number representing mismatch between patch1 and patch2
     """
     assert patch1.shape == patch2.shape, 'Differnt patch shapes'
-    error = 0
+    error = 0.0
     ### YOUR CODE HERE
-   
+    patch1 = patch1 - np.mean(patch1) / np.std(patch1)
+    patch2 = patch2 - np.mean(patch2) / np.std(patch2)
+    error = np.mean(np.power(np.subtract(patch2, patch1), 2))
     ### END YOUR CODE
     return error
 
