@@ -38,7 +38,6 @@ def meanShift(dst, track_window, max_iter=100,stop_thresh=1):
         label = np.ones(image_section.shape, dtype=int)
         properties = regionprops(label, image_section)
         my_mean = properties[0].weighted_centroid
-
         my_mean = np.array([my_mean[1] + x, my_mean[0] + y])
         c_new = max(int(my_mean[1] - h/2), 0)
         r_new = max(int(my_mean[0] - w/2), 0)
@@ -86,7 +85,11 @@ def lucas_kanade(img1, img2, keypoints, window_size=9):
         y, x = int(round(y)), int(round(x))
 
         ### YOUR CODE HERE
-        
+        A = np.zeros((window_size * window_size, 2), dtype=float)
+        A[:, 0] = Ix[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
+        A[:, 1] = Iy[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
+        print(A)
+
         ### END YOUR CODE
 
     flow_vectors = np.array(flow_vectors)
