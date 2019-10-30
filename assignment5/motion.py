@@ -142,7 +142,15 @@ def iterative_lucas_kanade(img1, img2, keypoints,
         A[:, 0] = Ix[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
         A[:, 1] = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
         AT = np.transpose(A)
+
         G = np.linalg.inv(np.matmul(AT, A))
+        # Ix_window = Ix[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
+        # Iy_window = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
+        # G = np.zeros((2, 2))
+        # G[0][0] = Ix_window ** 2
+        # G[0][1] = Ix_window * Iy_window
+        # G[1][0] = Ix_window * Iy_window
+        # G[1][1] = Iy_window ** 2
         G_inv = np.linalg.inv(G)
 
         ### END YOUR CODE
