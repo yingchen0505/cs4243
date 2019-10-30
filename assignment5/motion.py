@@ -90,8 +90,10 @@ def lucas_kanade(img1, img2, keypoints, window_size=9):
         A[:, 1] = Iy[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
         AT = np.transpose(A)
         b = It[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
-        print(AT)
-        print(b)
+        ATA_inverse = np.linalg.inv(np.matmul(AT, A))
+        ATb = np.matmul(AT, b)
+        x = np.matmul(ATA_inverse, ATb)
+        flow_vectors.append(x)
         ### END YOUR CODE
 
     flow_vectors = np.array(flow_vectors)
