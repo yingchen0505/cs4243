@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.patches import Circle
 from skimage.measure import regionprops
+from sklearn.metrics import mean_squared_error
 
 def listdir(path, list_name):
     for file in os.listdir(path):
@@ -89,7 +90,7 @@ def lucas_kanade(img1, img2, keypoints, window_size=9):
         A[:, 0] = Ix[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
         A[:, 1] = Iy[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
         AT = np.transpose(A)
-        b = It[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
+        b = - It[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
         ATA_inverse = np.linalg.inv(np.matmul(AT, A))
         ATb = np.matmul(AT, b)
         x = np.matmul(ATA_inverse, ATb)
@@ -143,15 +144,12 @@ def iterative_lucas_kanade(img1, img2, keypoints,
             A[:, 1] = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
             AT = np.transpose(A)
             G = np.linalg.inv(np.matmul(AT, A))
+            gx, gy = G
             G_inv = np.linalg.inv(G)
-            print("don't exist: " + str(G_inv))
+            # print("don't exist: " + str(G_inv))
         else:
             G_inv = np.linalg.inv(np.array(gy, gx))
-            print("exist: " + str(G_inv))
-        # A = np.zeros((window_size * window_size, 2), dtype=float)
-        # A[:, 0] = Ix[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
-        # A[:, 1] = Iy[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
-        # AT = np.transpose(A)
+            # print("exist: " + str(G_inv))
         # b = It[y - w: y + w + 1, x - w: x + w + 1].reshape((window_size * window_size))
         # ATA_inverse = np.linalg.inv(np.matmul(AT, A))
         # ATb = np.matmul(AT, b)
@@ -168,7 +166,10 @@ def iterative_lucas_kanade(img1, img2, keypoints,
             
             # TODO: Compute bk and vk = inv(G) x bk
             ### YOUR CODE HERE
-           
+            It = img2 - img1
+            # Ik =
+            bk = It[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].reshape((window_size * window_size))
+            vk = np.matmul(G_inv, bk)
             ### END YOUR CODE
 
             # Update flow vector by vk
@@ -233,7 +234,7 @@ def compute_error(patch1, patch2):
     ### YOUR CODE HERE
     patch1 = patch1 - np.mean(patch1) / np.std(patch1)
     patch2 = patch2 - np.mean(patch2) / np.std(patch2)
-    error = np.mean(np.power(np.subtract(patch2, patch1), 2))
+    error = mean_squared_error(patch2, patch1)
     ### END YOUR CODE
     return error
 
