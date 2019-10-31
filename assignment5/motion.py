@@ -94,6 +94,9 @@ def lucas_kanade(img1, img2, keypoints, window_size=9):
         ATA_inverse = np.linalg.inv(np.matmul(AT, A))
         ATb = np.matmul(AT, b)
         x = np.matmul(ATA_inverse, ATb)
+        # print('ATA_inverse = ' + str(ATA_inverse))
+        # print('ATb = ' + str(ATb))
+        # print('x = ' + str(x))
         flow_vectors.append(x)
         ### END YOUR CODE
 
@@ -143,15 +146,9 @@ def iterative_lucas_kanade(img1, img2, keypoints,
         A[:, 1] = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
         AT = np.transpose(A)
 
-        G = np.linalg.inv(np.matmul(AT, A))
-        # Ix_window = Ix[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
-        # Iy_window = Iy[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1].reshape((window_size * window_size))
-        # G = np.zeros((2, 2))
-        # G[0][0] = Ix_window ** 2
-        # G[0][1] = Ix_window * Iy_window
-        # G[1][0] = Ix_window * Iy_window
-        # G[1][1] = Iy_window ** 2
+        G = np.matmul(AT, A)
         G_inv = np.linalg.inv(G)
+        # print('G_inv = ' + str(G_inv))
 
         ### END YOUR CODE
 
@@ -173,6 +170,7 @@ def iterative_lucas_kanade(img1, img2, keypoints,
 
             # Update flow vector by vk
             v += vk
+            # print('v = ' + str(v))
 
         vx, vy = v
         flow_vectors.append([vy, vx])
@@ -210,6 +208,7 @@ def pyramid_lucas_kanade(img1, img2, keypoints,
     for L in range(level, -1, -1):
         ### YOUR CODE HERE
         d = 0
+        print(L)
         ### END YOUR CODE
 
 
@@ -231,8 +230,8 @@ def compute_error(patch1, patch2):
     assert patch1.shape == patch2.shape, 'Differnt patch shapes'
     error = 0.0
     ### YOUR CODE HERE
-    patch1 = patch1 - np.mean(patch1) / np.std(patch1)
-    patch2 = patch2 - np.mean(patch2) / np.std(patch2)
+    patch1 = patch1 - np.mean(patch1) if np.std(patch1) == 0 else patch1 - np.mean(patch1) / np.std(patch1)
+    patch2 = patch2 - np.mean(patch2) if np.std(patch2) == 0 else patch2 - np.mean(patch2) / np.std(patch2)
     error = mean_squared_error(patch2, patch1)
     ### END YOUR CODE
     return error
