@@ -209,7 +209,8 @@ def pyramid_lucas_kanade(img1, img2, keypoints,
         ### YOUR CODE HERE
         pL = keypoints / np.power(scale, L)
         d = iterative_lucas_kanade(img1=img1, img2=img2, keypoints=pL, g=g)
-        g = scale * (g + d)
+        if L > 0:
+            g = scale * (g + d)
         ### END YOUR CODE
 
     d = g + d
