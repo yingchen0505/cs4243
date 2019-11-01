@@ -156,10 +156,14 @@ def iterative_lucas_kanade(img1, img2, keypoints,
         for k in range(num_iters):
             vx, vy = v
             # Refined position of the point in the next frame
-            y2 = int(round(y+gy+vy)); x2 = int(round(x+gx+vx))
-            
+            y2 = max(int(round(y+gy+vy)), w); x2 = max(int(round(x+gx+vx)), w)
+            y2 = min(img2.shape[0] - w - 1, y2)
+            x2 = min(img2.shape[1] - w - 1, x2)
+
             # TODO: Compute bk and vk = inv(G) x bk
             ### YOUR CODE HERE
+            if img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].shape != (9, 9):
+                print('y2 = ' + str(y2) + ' x2 = ' + str(x2))
             Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
             Ik = Ik.reshape(window_size * window_size)
             bk = np.zeros(2)
@@ -199,8 +203,8 @@ def pyramid_lucas_kanade(img1, img2, keypoints,
     """
 
     # Build image pyramids of img1 and img2
-    pyramid1 = tuple(pyramid_gaussian(img1, max_layer=level, downscale=scale))
-    pyramid2 = tuple(pyramid_gaussian(img2, max_layer=level, downscale=scale))
+    pyramid1 = tuple(pyramid_gaussian(img1, max_layer=level, downscale=scale, multichannel=False))
+    pyramid2 = tuple(pyramid_gaussian(img2, max_layer=level, downscale=scale, multichannel=False))
 
     # Initialize pyramidal guess
     g = np.zeros(keypoints.shape)
