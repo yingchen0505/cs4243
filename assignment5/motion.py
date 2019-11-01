@@ -204,13 +204,13 @@ def pyramid_lucas_kanade(img1, img2, keypoints,
 
     # Initialize pyramidal guess
     g = np.zeros(keypoints.shape)
-
+    d = 0
     for L in range(level, -1, -1):
         ### YOUR CODE HERE
-        d = 0
-        print(L)
+        pL = keypoints / np.power(scale, L)
+        d = iterative_lucas_kanade(img1=img1, img2=img2, keypoints=pL, g=g)
+        g = scale * (g + d)
         ### END YOUR CODE
-
 
     d = g + d
     return d
