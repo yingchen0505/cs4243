@@ -137,8 +137,10 @@ def iterative_lucas_kanade(img1, img2, keypoints,
 
     for y, x, gy, gx in np.hstack((keypoints, g)):
         v = np.zeros(2) # Initialize flow vector as zero vector
-        y1 = int(round(y)); x1 = int(round(x))
-       
+        y1 = max(int(round(y)), w); x1 = max(int(round(x)), w)
+        y1 = min(img2.shape[0] - w - 1, y1)
+        x1 = min(img2.shape[1] - w - 1, x1)
+
         # TODO: Compute inverse of G at point (x1, y1)
         ### YOUR CODE HERE
         A = np.zeros((window_size * window_size, 2), dtype=float)
@@ -162,8 +164,8 @@ def iterative_lucas_kanade(img1, img2, keypoints,
 
             # TODO: Compute bk and vk = inv(G) x bk
             ### YOUR CODE HERE
-            if img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].shape != (9, 9):
-                print('y2 = ' + str(y2) + ' x2 = ' + str(x2))
+            # if img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1].shape != (9, 9):
+            #     print('y2 = ' + str(y2) + ' x2 = ' + str(x2))
             Ik = img1[y1 - w: y1 + w + 1, x1 - w: x1 + w + 1] - img2[y2 - w: y2 + w + 1, x2 - w: x2 + w + 1]
             Ik = Ik.reshape(window_size * window_size)
             bk = np.zeros(2)
@@ -212,7 +214,7 @@ def pyramid_lucas_kanade(img1, img2, keypoints,
     for L in range(level, -1, -1):
         ### YOUR CODE HERE
         pL = keypoints / np.power(scale, L)
-        d = iterative_lucas_kanade(img1=img1, img2=img2, keypoints=pL, g=g)
+        d = iterative_lucas_kanade(img1=img1, img2=img2, keypoints=pL, g=g, window_size=window_size, num_iters=num_iters)
         if L > 0:
             g = scale * (g + d)
         ### END YOUR CODE
